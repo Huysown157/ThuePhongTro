@@ -65,16 +65,16 @@ const Item = ({ images, user, title, star, description, attributes, address, id 
                         <img src="https://th.bing.com/th/id/R.945f33b643f2ceffcdae90fb57c61854?rik=XcI0SYBgSefoCA&riu=http%3a%2f%2fgetdrawings.com%2ffree-icon-bw%2fanonymous-avatar-icon-19.png&ehk=5n%2buJG66CeLQZsmhaMt8gag5rXuM3TdebAL6W35K1E4%3d&risl=&pid=ImgRaw&r=0" alt="avatar" className='w-[30px] h-[30px] object-cover rounded-full' />
                         <p>{user?.name}</p>
                     </div>
-                    <div className='flex items-center gap-1'>
+                   <div className="flex items-center gap-1">
                         <button
-                            type='button'
-                            className='bg-blue-700 text-white p-1 rounded-md'
+                            type="button"
+                            className="bg-blue-700 text-white  text-[14px]  px-[7px] py-[3px] rounded-md"
                         >
-                            {`Gọi ${user?.phone}`}
+                            {`Gọi ${user.phone}`}
                         </button>
                         <button
-                            type='button'
-                            className='text-blue-700 px-1 rounded-md border border-blue-700'
+                            type="button"
+                            className="bg-white px-[7px] py-[3px] text-blue-700 border text-[14px] border-blue-700 rounded-md"
                         >
                             Nhắn zalo
                         </button>

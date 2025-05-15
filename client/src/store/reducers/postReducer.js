@@ -3,7 +3,8 @@ const initState = {
     posts: [],
     msg: '',
     count: 0,
-    newPosts: []
+    newPosts: [],
+    detailPost: null
 }
 
 const postReducer = (state = initState, action) => {
@@ -21,6 +22,12 @@ const postReducer = (state = initState, action) => {
                 ...state,
                 msg: action.msg || '',
                 newPosts: action.newPosts || []
+            }
+        case actionTypes.GET_DETAIL_POST:
+            return {
+                ...state,
+                detailPost: action.detailPost || null,
+                msg: action.msg || ''
             }
         default:
             return state;

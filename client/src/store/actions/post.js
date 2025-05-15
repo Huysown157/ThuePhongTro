@@ -1,5 +1,5 @@
 import actionTypes from './actionTypes'
-import { apiGetNewPosts, apiGetPosts, apiGetPostsLimit } from '../../services/post'
+import { apiGetNewPosts, apiGetPosts, apiGetPostsLimit, apiGetDetailPost } from '../../services/post'
 
 export const getPosts = () => async (dispatch) => {
     try {
@@ -69,11 +69,24 @@ export const getNewPosts = () => async (dispatch) => {
         })
     }
 }
-export const editData = (dataEdit) => ({
-    type: actionTypes.EDIT_DATA,
-    dataEdit,
-});
-export const restEdittData = () => ({
-    type: actionTypes.RESET_DATAEDIT
- 
-});
+export const getDetailPost = (id) => async (dispatch) => {
+    try {
+        const response = await apiGetDetailPost(id)
+        if (response?.data.err === 0) {
+            dispatch({
+                type: actionTypes.GET_DETAIL_POST,
+                detailPost: response.data.response
+            })
+        } else {
+            dispatch({
+                type: actionTypes.GET_DETAIL_POST,
+                msg: response.data.msg
+            })
+        }
+    } catch (error) {
+        dispatch({
+            type: actionTypes.GET_DETAIL_POST,
+            detailPost: null
+        })
+    }
+}

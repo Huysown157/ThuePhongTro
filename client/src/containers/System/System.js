@@ -12,8 +12,10 @@ const System = () => {
         <div className='w-full h-screen flex flex-col items-center'>
             <Header />
             <div className='flex w-full flex-auto'>
-                <Sidebar />
-                <div className='flex-auto bg-white shadow-md h-full p-4'>
+                <div className='sidebar'>
+                    <Sidebar />
+                </div>
+                <div className='flex-auto bg-white shadow-md h-full p-4 overflow-y-scroll'>
                     <Outlet />
                 </div>
             </div>

@@ -9,8 +9,50 @@ const targets = [
 ]
 
 const Overview = ({ payload, setPayload }) => {
-    const { categories } = useSelector(state => state.app)
+    const { categories, prices, areas } = useSelector(state => state.app)
     const { currentData } = useSelector(state => state.user)
+
+    const getPriceCode = (value) => {
+        if (!prices || prices.length === 0) return ''; // Kiểm tra dữ liệu
+        const found = prices.find(item => {
+            const numbers = item.value.match(/\d+/g)?.map(Number) || [];
+            if (item.value.includes('Dưới')) return value < numbers[0];
+            if (item.value.includes('Trên')) return value > numbers[0];
+            if (numbers.length === 2) return value >= numbers[0] && value <= numbers[1];
+            return false;
+        });
+        return found?.code || '';
+    };
+
+    const getAreaCode = (value) => {
+        if (!areas || areas.length === 0) return ''; // Kiểm tra dữ liệu
+        const found = areas.find(item => {
+            const numbers = item.value.match(/\d+/g)?.map(Number) || [];
+            if (item.value.includes('Dưới')) return value < numbers[0];
+            if (item.value.includes('Trên')) return value > numbers[0];
+            if (numbers.length === 2) return value >= numbers[0] && value <= numbers[1];
+            return false;
+        });
+        return found?.code || '';
+    };
+
+    const handlePriceChange = (e) => {
+        const value = +e.target.value;
+        setPayload(prev => ({
+            ...prev,
+            priceNumber: value,
+            priceCode: getPriceCode(value)
+        }));
+    };
+
+    const handleAreaChange = (e) => {
+        const value = +e.target.value;
+        setPayload(prev => ({
+            ...prev,
+            areaNumber: value,
+            areaCode: getAreaCode(value)
+        }));
+    };
 
     const handleDescriptionChange = (e) => {
         setPayload(prev => ({
@@ -33,6 +75,7 @@ const Overview = ({ payload, setPayload }) => {
                             text: item.value
                         }))} 
                         label='Loại chuyên mục' 
+                        onChange={e => setPayload(prev => ({ ...prev, categoryCode: e.target.value }))}
                     />
                 </div>
                 <InputFormV2 
@@ -63,18 +106,18 @@ const Overview = ({ payload, setPayload }) => {
                     />
                     <InputFormV2 
                         value={payload.priceNumber} 
-                        setValue={setPayload} 
-                        small='Nhập đầy đủ số, ví dụ 1 triệu thì nhập là 1000000' 
                         label='Giá cho thuê' 
                         unit='đồng' 
                         name='priceNumber' 
+                        small='Nhập đầy đủ số, ví dụ 1 triệu thì nhập là 1000000' 
+                        onChange={handlePriceChange}
                     />
                     <InputFormV2 
                         value={payload.areaNumber} 
-                        setValue={setPayload} 
-                        name='areaNumber' 
                         label='Diện tích' 
                         unit='m2' 
+                        name='areaNumber' 
+                        onChange={handleAreaChange}
                     />
                     <Select 
                         value={payload.target} 

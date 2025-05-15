@@ -81,3 +81,20 @@ input[type="range"]::-ms-thumb:active {
         transform: translateX(100px);
     }
 }
+.swal2-confirm {
+    background-color: #d33 !important; /* Màu đỏ cho nút Xóa */
+    color: white !important;
+}
+
+.swal2-cancel {
+    background-color: #3085d6 !important; /* Màu xanh cho nút Hủy */
+    color: white !important;
+}
+.sidebar {
+    position: sticky; /* Giữ sidebar cố định khi cuộn */
+    top: 0; /* Đặt vị trí từ trên cùng */
+    height: 100vh; /* Chiều cao toàn màn hình */
+    overflow-y: auto; /* Thêm cuộn riêng cho sidebar nếu nội dung dài */
+    background-color: #fff; /* Màu nền */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Tạo hiệu ứng đổ bóng */
+}

@@ -38,8 +38,8 @@ const Address = ({ setPayload }) => {
         
         setPayload(prev => ({
             ...prev,
-            address: `${selectedDistrict?.name ? `${selectedDistrict.name},` : ''} ${selectedProvince?.name || ''}`.trim(),
-            province: selectedProvince?.name || ''
+            address: `${selectedDistrict?.name ? `${selectedDistrict.name},` : ''}${selectedProvince?.name || ''}`.trim(),
+            province: selectedProvince?.code || ''
         }))
     }, [province, district, provinces, districts])
 

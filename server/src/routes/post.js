@@ -1,19 +1,16 @@
 import express from 'express'
-import * as controllers from '../controllers/post'
+import * as postController from '../controllers/post'
 import verifyToken from '../middlewares/verifyToken'
 
 const router = express.Router()
-router.get('/all', controllers.getPosts)
-router.get('/limit', controllers.getLimitPosts)
-router.get('/new-post', controllers.getNewPosts)
 
-router.use(verifyToken)
-router.post('/create-new',controllers.createNewPost)
-router.get('/limit-admin',controllers.getLimitPostsAdmin)
-router.put('/update',controllers.updatePost)
-router.delete('/delete',controllers.deletePost)
+router.get('/all', postController.getPosts)
+router.get('/limit', postController.getPostsLimit)
+router.get('/new-post', postController.getNewPosts)
+router.get('/user-posts', verifyToken, postController.getPostsByUser)
 
-
-
+router.post('/create', postController.createPost)
+router.put('/:id', verifyToken, postController.updatePost)
+router.delete('/:id', verifyToken, postController.deletePost)
 
 export default router
