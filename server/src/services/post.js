@@ -92,11 +92,25 @@ export const createPostService = (data) => new Promise(async (resolve, reject) =
         if (!data.title || !data.categoryCode || !data.images || !data.address) {
             return resolve({ err: 1, msg: 'Thiếu thông tin bắt buộc!' })
         }
+
+        // Lấy thông tin Category và Province để xác định type và area
+        const category = await db.Category.findOne({ where: { code: data.categoryCode } });
+        const province = await db.Province.findOne({ where: { code: data.provinceCode } });
+
         // Tạo id cho các bảng liên quan
         const postId = uuidv4()
         const imagesId = uuidv4()
         const attributesId = uuidv4()
         const overviewId = uuidv4()
+
+        // Tạo code tự động (ví dụ: 8 ký tự đầu của UUID)
+        const generatedCode = uuidv4().slice(0, 8);
+
+        // Xác định type và area dựa trên thông tin lấy được
+        const postType = category ? category.value : '';
+        const postArea = (category && province) ? `${category.value} tại ${province.value}` : (category ? category.value : ''); // Kết hợp Category và Province
+        const postBonus = 'Tin thường'; // Bonus mặc định
+
         // Lưu ảnh
         await db.Image.create({ id: imagesId, image: JSON.stringify(data.images) })
         // Lưu thuộc tính
@@ -104,11 +118,11 @@ export const createPostService = (data) => new Promise(async (resolve, reject) =
         // Lưu overview
         await db.Overview.create({
             id: overviewId,
-            code: '',
-            area: '',
-            type: '',
+            code: generatedCode, // Sử dụng code tự tạo
+            area: postArea,     // Sử dụng area đã xác định
+            type: postType,     // Sử dụng type đã xác định
             target: data.target || '',
-            bonus: '',
+            bonus: postBonus,   // Sử dụng bonus mặc định
             created: generateDate().today,
             expired: generateDate().expireDay,
         })

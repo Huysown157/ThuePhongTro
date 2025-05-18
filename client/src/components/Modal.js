@@ -104,7 +104,7 @@ const Modal = ({ setIsShowModal, content, name, handleSubmit, queries, arrMinMax
                         <GrLinkPrevious size={24} />
                     </span>
                 </div>
-                {(name === 'category' || name === 'province') && <div className='p-4 flex flex-col'>
+                {(name === 'category') && <div className='p-4 flex flex-col max-h-[400px] overflow-y-auto'>
                     <span className='py-2 flex gap-2 items-center border-b border-gray-200'>
                         <input
                             type="radio"
@@ -132,6 +132,23 @@ const Modal = ({ setIsShowModal, content, name, handleSubmit, queries, arrMinMax
                         )
                     })}
                 </div>}
+                {name === 'province' && (
+                    <div className="province-list-scroll max-h-[350px] overflow-y-auto">
+                        {content?.map(item => (
+                            <label key={item.code} className="flex items-center py-2 cursor-pointer px-4">
+                                <input
+                                    type="radio"
+                                    name="province"
+                                    value={item.value}
+                                    checked={queries.province === item.value}
+                                    onChange={e => handleSubmit(e, { province: item.value, provinceCode: item.code })}
+                                    className="mr-2"
+                                />
+                                {item.value}
+                            </label>
+                        ))}
+                    </div>
+                )}
                 {(name === 'price' || name === 'area') && <div className='p-12 py-20 '>
                     <div className='flex flex-col items-center justify-center relative'>
                         <div className='z-30 absolute top-[-48px] font-bold text-xl text-orange-600'>

@@ -38,20 +38,24 @@ const Overview = ({ payload, setPayload }) => {
 
     const handlePriceChange = (e) => {
         const value = +e.target.value;
-        setPayload(prev => ({
-            ...prev,
-            priceNumber: value,
-            priceCode: getPriceCode(value)
-        }));
+        if (!isNaN(value) || e.target.value === '') {
+            setPayload(prev => ({
+                ...prev,
+                priceNumber: value,
+                priceCode: getPriceCode(value)
+            }));
+        }
     };
 
     const handleAreaChange = (e) => {
         const value = +e.target.value;
-        setPayload(prev => ({
-            ...prev,
-            areaNumber: value,
-            areaCode: getAreaCode(value)
-        }));
+        if (!isNaN(value) || e.target.value === '') {
+            setPayload(prev => ({
+                ...prev,
+                areaNumber: value,
+                areaCode: getAreaCode(value)
+            }));
+        }
     };
 
     const handleDescriptionChange = (e) => {

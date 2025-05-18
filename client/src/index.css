@@ -98,3 +98,7 @@ input[type="range"]::-ms-thumb:active {
     background-color: #fff; /* Màu nền */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Tạo hiệu ứng đổ bóng */
 }
+.province-list-scroll {
+    max-height: 350px;
+    overflow-y: auto;
+}

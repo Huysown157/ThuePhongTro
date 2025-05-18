@@ -56,15 +56,22 @@ const CreatePost = () => {
     const handleSubmit = async () => {
         const finalPayload = {
             ...payload,
-            userId: currentData?.id || '', // Đảm bảo userId không bị null
+            userId: currentData?.id || '',
             provinceCode: payload.province,
             labelCode: payload.categoryCode || 'DEFAULT_LABEL',
-            priceCode: payload.priceCode || '', // Đảm bảo priceCode được truyền
-            areaCode: payload.areaCode || '', // Đảm bảo areaCode được truyền
+            priceCode: payload.priceCode || '',
+            areaCode: payload.areaCode || '',
             price: payload.priceNumber ? `${payload.priceNumber} đồng/tháng` : '',
             acreage: payload.areaNumber ? `${payload.areaNumber}m2` : '',
             published: new Date().toISOString().split('T')[0],
-            hashtag: `#${Math.floor(Math.random() * 1000000)}`
+            hashtag: `#${Math.floor(Math.random() * 1000000)}`,
+            overview: {
+                code: payload.code || '',      // mã tin
+                area: payload.area || '',      // khu vực
+                type: payload.type || '',      // loại tin rao
+                target: payload.target || '',  // đối tượng thuê
+                bonus: payload.bonus || '',    // gói tin
+            }
         }
         try {
             const res = await apiCreatePost(finalPayload)
