@@ -32,7 +32,7 @@ const Header = () => {
                     <img
                         src={logo}
                         alt="logo"
-                        className='w-[240px] h-[100px] object-cont  ain'
+                        className='w-[250px] h-[160px] object-cont  ain'
                     />
                 </Link>
                 <div className='flex items-center gap-1'>

@@ -6,6 +6,7 @@ import { getCodes, getCodesArea } from '../../ultils/Common/getCodes'
 import { useSelector } from 'react-redux'
 import Swal from 'sweetalert2'
 import validate from '../../ultils/Common/validateFields'
+import OSMMap from '../../components/OSMMap'
 
 const { BsCameraFill, ImBin } = icons
 
@@ -135,8 +136,7 @@ const CreatePost = () => {
                     </div>
                 </div>
                 <div className='w-[30%] flex-none'>
-                    maps
-                    <Loading />
+                    <OSMMap address={payload.address} />
                 </div>
             </div>
         </div>

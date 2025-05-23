@@ -12,6 +12,7 @@ export const getPostsService = () => new Promise(async (resolve, reject) => {
                 { model: db.Image, as: 'images', attributes: ['image'] },
                 { model: db.Attribute, as: 'attributes', attributes: ['price', 'acreage', 'published', 'hashtag'] },
                 { model: db.User, as: 'user', attributes: ['name', 'zalo', 'phone'] },
+                { model: db.Overview, as: 'overview', attributes: ['expired'] },
             ],
             attributes: ['id', 'title', 'star', 'address', 'description']
         })
@@ -113,8 +114,19 @@ export const createPostService = (data) => new Promise(async (resolve, reject) =
 
         // Lưu ảnh
         await db.Image.create({ id: imagesId, image: JSON.stringify(data.images) })
+        // Xử lý ngày bắt đầu và ngày hết hạn
+        let publishedDate = new Date(); // Luôn lấy ngày hiện tại
+        let expiredDate = new Date(publishedDate);
+        expiredDate.setDate(expiredDate.getDate() + 30);
+        // Format lại ngày cho giống formatDate trong generateDate.js
+        // const formatDate = (timeObj) => {
+        //     let day = timeObj.getDay() === 0 ? 'Chủ nhật' : `Thứ ${timeObj.getDay() + 1}`;
+        //     let date = `${timeObj.getDate()}/${timeObj.getMonth() + 1}/${timeObj.getFullYear()}`;
+        //     let time = `${timeObj.getHours()}:${timeObj.getMinutes()}`;
+        //     return `${day}, ${time} ${date}`;
+        // };
         // Lưu thuộc tính
-        await db.Attribute.create({ id: attributesId, price: data.price, acreage: data.acreage, published: data.published, hashtag: data.hashtag })
+        await db.Attribute.create({ id: attributesId, price: data.price, acreage: data.acreage, published: publishedDate.toISOString(), hashtag: data.hashtag })
         // Lưu overview
         await db.Overview.create({
             id: overviewId,
@@ -123,8 +135,8 @@ export const createPostService = (data) => new Promise(async (resolve, reject) =
             type: postType,     // Sử dụng type đã xác định
             target: data.target || '',
             bonus: postBonus,   // Sử dụng bonus mặc định
-            created: generateDate().today,
-            expired: generateDate().expireDay,
+            created: publishedDate.toISOString(),
+            expired: expiredDate.toISOString(),
         })
         // Lưu bài đăng
         await db.Post.create({
@@ -160,6 +172,7 @@ export const getPostsByUserService = (userId) => new Promise(async (resolve, rej
             include: [
                 { model: db.Image, as: 'images', attributes: ['image'] },
                 { model: db.Attribute, as: 'attributes', attributes: ['price', 'acreage', 'published', 'hashtag'] },
+                { model: db.Overview, as: 'overview', attributes: ['expired'] },
             ],
             attributes: ['id', 'title', 'star', 'address', 'description', 'createdAt']
         })
@@ -175,15 +188,79 @@ export const getPostsByUserService = (userId) => new Promise(async (resolve, rej
 
 export const updatePostService = (id, payload) => new Promise(async (resolve, reject) => {
     try {
-        const response = await db.Post.update(payload, { where: { id } })
+        // Tìm bài post cần cập nhật
+        const post = await db.Post.findOne({
+            where: { id },
+            include: [
+                { model: db.Attribute, as: 'attributes' },
+                { model: db.Overview, as: 'overview' },
+                { model: db.Image, as: 'images' }
+            ]
+        });
+
+        if (!post) {
+            return resolve({
+                err: 1,
+                msg: 'Không tìm thấy tin đăng cần cập nhật.'
+            });
+        }
+
+        // Cập nhật Attribute
+        if (post.attributes && payload.price && payload.acreage) {
+            await db.Attribute.update(
+                {
+                    price: payload.price,
+                    acreage: payload.acreage,
+                    hashtag: payload.hashtag || post.attributes.hashtag
+                },
+                { where: { id: post.attributes.id } }
+            );
+        }
+
+        // Cập nhật Overview
+        if (post.overview && payload.target) {
+            await db.Overview.update(
+                {
+                    target: payload.target,
+                    bonus: payload.bonus || post.overview.bonus,
+                    area: payload.area || post.overview.area,
+                    type: payload.type || post.overview.type
+                },
+                { where: { id: post.overview.id } }
+            );
+        }
+
+        // Cập nhật Image
+        if (post.images && payload.images) {
+            await db.Image.update(
+                { image: payload.images },
+                { where: { id: post.images.id } }
+            );
+        }
+
+        // Cập nhật Post
+        const postUpdateData = {
+            title: payload.title || post.title,
+            address: payload.address || post.address,
+            categoryCode: payload.categoryCode || post.categoryCode,
+            priceCode: payload.priceCode || post.priceCode,
+            areaCode: payload.areaCode || post.areaCode,
+            provinceCode: payload.provinceCode || post.provinceCode,
+            description: payload.description || post.description,
+            priceNumber: payload.priceNumber || post.priceNumber,
+            areaNumber: payload.areaNumber || post.areaNumber
+        };
+
+        await db.Post.update(postUpdateData, { where: { id } });
+
         resolve({
-            err: response[0] === 1 ? 0 : 1,
-            msg: response[0] === 1 ? 'Cập nhật tin thành công!' : 'Không có thay đổi hoặc tin không tồn tại.'
-        })
+            err: 0,
+            msg: 'Cập nhật tin thành công!'
+        });
     } catch (error) {
-        reject(error)
+        reject(error);
     }
-})
+});
 
 export const deletePostService = (id) => new Promise(async (resolve, reject) => {
     try {

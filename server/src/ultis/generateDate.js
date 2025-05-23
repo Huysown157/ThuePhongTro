@@ -7,10 +7,10 @@ const formatDate = (timeObj) => {
   return `${day}, ${time} ${date}`
 }
 
-const generateDate = () => {
-  let gapExpire = Math.floor(Math.random() * 29) + 1
+// Nhận vào số ngày cộng thêm (mặc định 30)
+const generateDate = (plusDays = 30) => {
   let today = new Date()
-  let expireDay = moment(today).add(gapExpire, 'd').toDate()
+  let expireDay = moment(today).add(plusDays, 'd').toDate()
   return {
     today: formatDate(today),
     expireDay: formatDate(expireDay)

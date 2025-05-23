@@ -74,18 +74,18 @@ export const apiGetUserPosts = () => new Promise(async (resolve, reject) => {
         reject(error)
     }
 })
-export const apiUpdatePost = (id, data) => new Promise(async (resolve, reject) => {
+export const apiUpdatePost = (postId, data) => new Promise(async (resolve, reject) => {
     try {
         const response = await axiosConfig({
             method: 'put',
-            url: `/api/v1/post/${id}`,
+            url: `/api/v1/post/${postId}`,
             data
-        })
-        resolve(response)
+        });
+        resolve(response);
     } catch (error) {
-        reject(error)
+        reject(error);
     }
-})
+});
 export const apiDeletePost = (id) => new Promise(async (resolve, reject) => {
     try {
         const response = await axiosConfig({
