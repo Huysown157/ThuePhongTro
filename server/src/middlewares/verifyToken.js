@@ -1,23 +1,24 @@
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
 const verifyToken = (req, res, next) => {
+  let accessToken = req.headers.authorization?.split(" ")[1];
+  // console.log(accessToken);
+  if (!accessToken)
+    return res.status(401).json({
+      err: 1,
+      msg: "Missing access token",
+    });
 
-    let accessToken = req.headers.authorization?.split(' ')[1]
-    if (!accessToken) return res.status(401).json({
+  jwt.verify(accessToken, process.env.SECRET_KEY, (err, user) => {
+    if (err) {
+      return res.status(401).json({
         err: 1,
-        msg: 'Missing access token'
-    })
+        msg: err.message,
+      });
+    }
 
-    jwt.verify(accessToken, process.env.SECRET_KEY, (err, user) => {
-        if (err) return res.status(401).json({
-            err: 1,
-            msg: 'Access token expired'
-        })
+    req.user = user;
+    next();
+  });
+};
 
-        req.user = user
-        next()
-    })
-
-
-}
-
-export default verifyToken
+export default verifyToken;

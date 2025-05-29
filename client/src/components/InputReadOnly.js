@@ -1,18 +1,20 @@
-import React from 'react'
+import React from "react";
 
 const InputReadOnly = ({ label, value }) => {
-    return (
-        <div className='flex flex-col gap-2'>
-            <label className='font-medium' htmlFor="exactly-address">{label}</label>
-            <input
-                type='text'
-                id='exactly-address'
-                readOnly
-                className='border border-gray-200 outline-none rounded-md bg-gray-100 p-2 w-full'
-                value={value || ''}
-            />
-        </div>
-    )
-}
+  return (
+    <div className="flex flex-col gap-2">
+      <label className="font-medium" htmlFor="exact-address">
+        {label}
+      </label>
+      <input
+        value={value || ""}
+        id="exact-address"
+        type="text"
+        readOnly
+        className="border p-2 rounded-md outline-none bg-gray-200 "
+      />
+    </div>
+  );
+};
 
-export default InputReadOnly
+export default InputReadOnly;

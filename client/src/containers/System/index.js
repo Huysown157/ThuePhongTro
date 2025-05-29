@@ -1,6 +1,11 @@
-export { default as System } from './System'
-export { default as CreatePost } from './CreatePost'
-export { default as Header } from './Header'
-export { default as Sidebar } from './Sidebar'
-export { default as ManagePosts } from './ManagePosts'
-export { default as EditProfile } from './EditProfile'
+export { default as System } from "./System";
+export { default as CreatePost } from "./CreatePost";
+export { default as Header } from "./Header";
+export { default as Sidebar } from "./Sidebar";
+export { default as ManagePost } from "./ManagePost";
+export { default as EditProfile } from "./EditProfile";
+export { default as ManageUser } from "./ManageUser";
+export { default as ManageCate } from "./ManageCate";
+export { default as ManagePrice } from "./ManagePrice";
+export { default as ManageArea } from "./ManageArea";
+export { default as FavoritePost } from "./FavoritePost";

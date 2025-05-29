@@ -1,22 +1,28 @@
-import express from 'express'
-require('dotenv').config()
-import cors from 'cors'
-import initRoutes from './src/routes'
-import connectDatabase from './src/config/connectDatabase'
+import * as dotenv from "dotenv";
+import express from "express";
+import connectDB from "./src/config/connectDB";
+import initRoutes from "./src/routes";
+dotenv.config();
+import cors from "cors";
+import handleError from "./src/middlewares/handleError";
 
-const app = express()
-app.use(cors({
+const app = express();
+app.use(
+  cors({
     origin: process.env.CLIENT_URL,
-    methods: ["POST", 'GET', 'PUT', "DELETE"]
-}))
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+    methods: ["POST", "GET", "PUT", "DELETE"],
+  })
+);
 
-initRoutes(app)
-connectDatabase()
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-const port = process.env.PORT || 8888
-const listener = app.listen(port, () => {
-    console.log(`Server is running on the port ${listener.address().port}`)
-})
+initRoutes(app);
+handleError(app);
 
+connectDB();
+
+const port = process.env.PORT || 8888;
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
+});

@@ -1,88 +1,144 @@
-import React, { memo, useState } from 'react'
-import icons from '../ultils/icons'
-import { useNavigate, Link } from 'react-router-dom'
-import { formatVietnameseToString } from '../ultils/Common/formatVietnameseToString'
+import React, { memo, useCallback, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { convertToSlug } from "../utils/Common/convertToSlug";
+import { getDistrictProvince } from "../utils/Common/getDistrictProvince";
+import { truncateText } from "../utils/Common/truncateText";
+import icons from "../utils/icons";
+import anonAvatar from "../assets/anon-avatar.png";
+import convertToMillion from "../utils/Common/convertToMillion";
+import { useDispatch, useSelector } from "react-redux";
+import { addFavorite } from "../store/actions";
 
-const indexs = [0, 1, 2, 3]
+const { GrStar, RiHeartLine, RiHeartFill } = icons;
 
-const { GrStar, RiHeartFill, RiHeartLine, BsBookmarkStarFill } = icons
+const Item = ({
+  address,
+  description,
+  price,
+  area,
+  images,
+  star,
+  title,
+  user,
+  id,
+  filters,
+  isFavorite = false,
+}) => {
+  const [isHoverHeart, setIsHoverHeart] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { currentUser: userFavorite } = useSelector((state) => state.user);
 
-const Item = ({ images, user, title, star, description, attributes, address, id }) => {
-    const [isHoverHeart, setIsHoverHeart] = useState(false)
-
-    const handleStar = (star) => {
-        let stars = []
-        for (let i = 1; i <= +star; i++) stars.push(<GrStar className='star-item' size={18} color='yellow' />)
-        return stars
-
+  const handleStar = (star) => {
+    let stars = [];
+    for (let i = 1; i <= +star; i++) {
+      stars.push(
+        <GrStar className="inline-block mb-1" size={18} color="orange" />
+      );
     }
-    return (
-        <div className='w-full flex border-t border-orange-600 py-4'>
-            <Link
-                to={`chi-tiet/${formatVietnameseToString(title)}/${id}`}
-                className='w-2/5 flex flex-wrap gap-[2px] items-center relative cursor-pointer'
-            >
-                {images.length > 0 && images.filter((i, index) => indexs.some(i => i === index))?.map((i, index) => {
-                    return (
-                        <img key={index} src={i} alt="preview" className='w-[47%] h-[120px] object-cover' />
-                    )
-                })}
-                <span className='bg-overlay-70 text-white px-2 rounded-md absolute left-1 bottom-4'>{`${images.length} ảnh`}</span>
-                <span
-                    className='text-white absolute right-5 bottom-1'
-                    onMouseEnter={() => setIsHoverHeart(true)}
-                    onMouseLeave={() => setIsHoverHeart(false)}
-                >
-                    {isHoverHeart ? <RiHeartFill size={26} color='red' /> : <RiHeartLine size={26} />}
-                </span>
-            </Link>
-            <div className='w-3/5'>
-                <div className='flex justify-between gap-4 w-full'>
-                    <div className='text-red-600 font-medium'>
-                        {handleStar(+star).length > 0 && handleStar(+star).map((star, number) => {
-                            return (
-                                <span key={number}>{star}</span>
-                            )
-                        })}
-                        {title}
-                    </div>
-                    <div className='w-[10%] flex justify-end'>
-                        <BsBookmarkStarFill size={24} color='orange' />
-                    </div>
-                </div>
-                <div className='my-2 flex items-center justify-between gap-2'>
-                    <span className='font-bold flex-3 text-green-600  whitespace-nowrap overflow-hidden text-ellipsis'>{attributes?.price}</span>
-                    <span className='flex-1'>{attributes?.acreage}</span>
-                    <span className='flex-3 whitespace-nowrap overflow-hidden text-ellipsis'>
-                        {`${address.split(',')[address.split(',').length - 2]}${address.split(',')[address.split(',').length - 1]}`}
-                    </span>
-                </div>
-                <p className='text-gray-500 w-full h-[50px] text-ellipsis overflow-hidden'>
-                    {description}
-                </p>
-                <div className='flex items-center my-5 justify-between'>
-                    <div className=' flex items-center'>
-                        <img src="https://th.bing.com/th/id/R.945f33b643f2ceffcdae90fb57c61854?rik=XcI0SYBgSefoCA&riu=http%3a%2f%2fgetdrawings.com%2ffree-icon-bw%2fanonymous-avatar-icon-19.png&ehk=5n%2buJG66CeLQZsmhaMt8gag5rXuM3TdebAL6W35K1E4%3d&risl=&pid=ImgRaw&r=0" alt="avatar" className='w-[30px] h-[30px] object-cover rounded-full' />
-                        <p>{user?.name}</p>
-                    </div>
-                   <div className="flex items-center gap-1">
-                        <button
-                            type="button"
-                            className="bg-blue-700 text-white  text-[14px]  px-[7px] py-[3px] rounded-md"
-                        >
-                            {`Gọi ${user.phone}`}
-                        </button>
-                        <button
-                            type="button"
-                            className="bg-white px-[7px] py-[3px] text-blue-700 border text-[14px] border-blue-700 rounded-md"
-                        >
-                            Nhắn zalo
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    )
-}
+    return stars;
+  };
 
-export default memo(Item)
+  const handleClickFavorite = (postId) => {
+    if (!postId) return;
+
+    if (Object.keys(userFavorite).length === 0) {
+      navigate(`/login`, { replace: true });
+      return;
+    }
+
+    const payload = {
+      userId: userFavorite.id,
+      postId: postId,
+      filters: filters,
+    };
+
+    dispatch(addFavorite(payload));
+  };
+
+  const handleChangeHover = useCallback((bool) => {
+    setIsHoverHeart(() => bool);
+  }, []);
+
+  return (
+    <div className="flex flex-row w-full gap-3 py-4 border-t border-orange-600">
+      <div className="w-full basis-2/5 relative cursor-pointer">
+        <Link
+          to={`/chi-tiet/${convertToSlug(title?.replaceAll("/", "-"))}/${id}`}
+        >
+          <img
+            src={images[0]?.url}
+            alt="preview"
+            className="w-full rounded-md h-[250px] block object-cover "
+          />
+        </Link>
+
+        <span className="bg-overlay-70 text-white py-1 px-2 rounded-md absolute bottom-1 left-1">
+          {`${images.length} ảnh`}
+        </span>
+        <span
+          className=" text-white rounded-md absolute bottom-1 right-1"
+          onMouseEnter={() => handleChangeHover(true)}
+          onMouseLeave={() => handleChangeHover(false)}
+          onClick={() => handleClickFavorite(id)}
+        >
+          {isHoverHeart || isFavorite ? (
+            <RiHeartFill size={24} color="red" />
+          ) : (
+            <RiHeartLine size={24} />
+          )}
+        </span>
+      </div>
+
+      <div className="w-full basis-3/5">
+        <div>
+          <div className="text-red-600 font-semibold">
+            {/* {handleStar(+star).length > 0 &&
+              handleStar(+star).map((star, number) => {
+                return <span key={number}>{star}</span>;
+              })} */}
+            <Link
+              to={`/chi-tiet/${convertToSlug(
+                title?.replaceAll("/", "-")
+              )}/${id}`}
+            >
+              {title}
+            </Link>
+          </div>
+        </div>
+
+        <div className="flex items-center my-2 justify-between">
+          <span className="font-bold text-green-600">
+            {convertToMillion(price)}
+          </span>
+          <span>{area + "m²"}</span>
+          <span>{getDistrictProvince(address)}</span>
+        </div>
+        <p className="text-gray-500">{truncateText(description, 180)}</p>
+        <div className="flex items-center mt-4 justify-between">
+          <div className="flex items-center gap-1">
+            <img
+              src={user?.avatar || anonAvatar}
+              alt="avatar"
+              className="w-[30px] h-[30px] object-cover rounded-full "
+            />
+            <p>{user?.fullName}</p>
+          </div>
+          <div className="flex items-center gap-1">
+            <button className="bg-blue-700 text-white py-1 px-2 rounded-md">
+              {`Gọi ${user?.phone}`}
+            </button>
+            <Link
+              to={`https://zalo.me/${user?.phone}`}
+              className="text-blue-700 py-1 px-2 rounded-md border border-blue-700 "
+            >
+              Nhắn Zalo
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default memo(Item);

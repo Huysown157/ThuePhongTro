@@ -1,17 +1,18 @@
-import React from 'react'
-import { Navigation } from '../Public'
+import React from "react";
+import { Link } from "react-router-dom";
+import { Navigation } from "../Public";
 
 const Header = () => {
-    return (
-        <div className='w-full flex flex-none h-[40px]'>
-            <div className='flex justify-center items-center font-bold bg-secondary1 text-white w-[256px] flex-none'>
-                F3-HUTECH
-            </div>
-            <div className='flex-auto'>
-                <Navigation isAdmin={true} />
-            </div>
-        </div>
-    )
-}
+  return (
+    <div className="grid grid-cols-12 fixed left-0 right-0">
+      <div className="col-span-2 flex items-center justify-center font-bold text-white bg-secondary1 ">
+        <Link to={"/"}>F3-HUTECH</Link>
+      </div>
+      <div className="col-span-10">
+        <Navigation isAdmin={true} />
+      </div>
+    </div>
+  );
+};
 
-export default Header
+export default Header;

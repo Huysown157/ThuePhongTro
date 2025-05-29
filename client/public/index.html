@@ -15,6 +15,7 @@
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -25,10 +26,48 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>React App</title>
+    <!-- <style>
+      html,
+      body,
+      #map {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 14px;
+        color: #323232;
+      }
+    </style> -->
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <!-- <div id="map"></div>
+
+    <script>
+      const apiKey =
+        "AAPK9da88b6ecd2f41f1b082da478a710ae3hswDcbGqFLvmY4fNSF3cipoI5pv-cSLaeqlNZJv2Ct13V3wwW1LOnT-tQ14sJ95K";
+
+      const map = L.map("map");
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
+
+      L.esri.Geocoding.geocode({
+        apikey: apiKey,
+      })
+        .text("Đại học Cần Thơ Khu 1")
+        .run(function (error, response) {
+          if (error) {
+            return;
+          }
+
+          map.fitBounds(response.results[0].bounds);
+        });
+    </script> -->
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.

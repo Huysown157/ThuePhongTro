@@ -1,42 +1,42 @@
-import actionTypes from "../actions/actionTypes";
+import actionTypes from "../actions/actionType";
+
 const initState = {
-    msg: '',
-    categories: [],
-    prices: [],
-    areas: [],
-    provinces: []
-}
+  msg: "",
+  categories: [],
+  priceRanges: [],
+  areaRanges: [],
+  provinces: [],
+};
 
 const appReducer = (state = initState, action) => {
-    switch (action.type) {
-        case actionTypes.GET_CATEGORIES:
-            return {
-                ...state,
-                categories: action.categories || [],
-                msg: action.msg || '',
-            }
-        case actionTypes.GET_PRICES:
-            return {
-                ...state,
-                prices: action.prices || [],
-                msg: action.msg || '',
-            }
-        case actionTypes.GET_AREAS:
-            return {
-                ...state,
-                areas: action.areas || [],
-                msg: action.msg || '',
-            }
-        case actionTypes.GET_PROVINCES:
-            return {
-                ...state,
-                provinces: action.provinces || [],
-                msg: action.msg || '',
-            }
-        default:
-            return state;
-    }
+  switch (action.type) {
+    case actionTypes.GET_CATEGORIES:
+      return {
+        ...state,
+        categories: action.categories || [],
+        msg: action.msg || "",
+      };
+    case actionTypes.GET_PRICE_RANGES:
+      return {
+        ...state,
+        priceRanges: action.priceRanges || [],
+        msg: action.msg || "",
+      };
+    case actionTypes.GET_AREA_RANGES:
+      return {
+        ...state,
+        areaRanges: action.areaRanges || [],
+        msg: action.msg || "",
+      };
+    case actionTypes.GET_PROVINCES:
+      return {
+        ...state,
+        provinces: action.provinces || [],
+        msg: action.msg || "",
+      };
 
-}
-
-export default appReducer
+    default:
+      return state;
+  }
+};
+export default appReducer;

@@ -1,26 +1,24 @@
-import actionTypes from "../actions/actionTypes";
+import actionTypes from "../actions/actionType";
 
 const initState = {
-    currentData: {}
-}
+  currentUser: {},
+};
 
 const userReducer = (state = initState, action) => {
-    switch (action.type) {
-        case actionTypes.GET_CURRENT:
-            return {
-                ...state,
-                currentData: action.currentData || {}
-            }
-        case actionTypes.LOGOUT:
-            return {
-                ...state,
-                currentData: {}
-            }
+  switch (action.type) {
+    case actionTypes.GET_CURRENT_USER:
+      return {
+        ...state,
+        currentUser: action.currentUser || {},
+      };
+    case actionTypes.LOGOUT:
+      return {
+        ...state,
+        currentUser: {},
+      };
+    default:
+      return state;
+  }
+};
 
-
-        default:
-            return state;
-    }
-}
-
-export default userReducer
+export default userReducer;

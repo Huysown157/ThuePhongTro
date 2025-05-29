@@ -1,77 +1,180 @@
-import axios from '../axiosConfig'
-import axiosDefault from 'axios'
+import axios from "../axiosConfig";
+import axiosDefault from "axios";
 
-export const apiGetPrices = () => new Promise(async (resolve, reject) => {
+export const apiGetPriceRanges = () =>
+  new Promise(async (resolve, reject) => {
     try {
-        const response = await axios({
-            method: 'get',
-            url: '/api/v1/price/all'
-        })
-        resolve(response)
+      const response = await axios({
+        method: "get",
+        url: "api/v1/price-range/all",
+      });
+
+      resolve(response);
     } catch (error) {
-        reject(error)
+      reject(error);
     }
-})
-export const apiGetAreas = () => new Promise(async (resolve, reject) => {
+  });
+
+export const apiUpdatePriceRange = (payload) => {
+  return new Promise(async (resolve, reject) => {
     try {
-        const response = await axios({
-            method: 'get',
-            url: '/api/v1/area/all'
-        })
-        resolve(response)
+      const response = await axios({
+        method: "put",
+        url: "api/v1/price-range/update",
+        data: payload,
+      });
+
+      resolve(response);
     } catch (error) {
-        reject(error)
+      reject(error);
     }
-})
-export const apiGetProvinces = () => new Promise(async (resolve, reject) => {
+  });
+};
+
+export const apiAddPriceRange = (payload) => {
+  return new Promise(async (resolve, reject) => {
     try {
-        const response = await axios({
-            method: 'get',
-            url: '/api/v1/province/all'
-        })
-        resolve(response)
+      const response = await axios({
+        method: "post",
+        url: "api/v1/price-range/create",
+        data: payload,
+      });
+
+      resolve(response);
     } catch (error) {
-        reject(error)
+      reject(error);
     }
-})
-export const apiGetPublicProvinces = () => new Promise(async (resolve, reject) => {
+  });
+};
+
+export const apiDeletePriceRange = (id) => {
+  return new Promise(async (resolve, reject) => {
     try {
-        const response = await axiosDefault({
-            method: 'get',
-            url: 'https://provinces.open-api.vn/api/'
-        })
-        const formattedData = response.data.map(item => ({
-            ...item,
-            name: item.name,
-            code: item.code
-        }))
-        resolve({
-            data: formattedData,
-            status: response.status
-        })
+      const response = await axios({
+        method: "delete",
+        url: `api/v1/price-range/delete/${id}`,
+      });
+
+      resolve(response);
     } catch (error) {
-        reject(error)
+      reject(error);
     }
-})
-export const apiGetPublicDistrict = (provinceId) => new Promise(async (resolve, reject) => {
+  });
+};
+
+export const apigetAreaRanges = () =>
+  new Promise(async (resolve, reject) => {
     try {
-        const response = await axiosDefault({
-            method: 'get',
-            url: `https://provinces.open-api.vn/api/p/${provinceId}/?depth=2`
-        })
-        const formattedData = {
-            ...response.data,
-            districts: response.data.districts.map(item => ({
-                ...item,
-                name: item.name,
-                code: item.code
-            }))
-        }
-        resolve({
-            data: formattedData,
-            status: response.status
-        })
+      const response = await axios({
+        method: "get",
+        url: "api/v1/area-range/all",
+      });
+
+      resolve(response);
     } catch (error) {
-        reject(error)
+      reject(error);
     }
-})
+  });
+
+export const apiUpdateAreaRange = (payload) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await axios({
+        method: "put",
+        url: "api/v1/area-range/update",
+        data: payload,
+      });
+
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+export const apiAddAreaRange = (payload) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await axios({
+        method: "post",
+        url: "api/v1/area-range/create",
+        data: payload,
+      });
+
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+export const apiDeleteAreaRange = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await axios({
+        method: "delete",
+        url: `api/v1/area-range/delete/${id}`,
+      });
+
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+export const apiGetProvinces = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axios({
+        method: "get",
+        url: "api/v1/province/all",
+      });
+      // console.log(response);
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiGetPublicProvinces = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosDefault({
+        method: "get",
+        url: "https://vapi.vnappmob.com/api/v2/province/",
+      });
+
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiGetPublicDistricts = (provinceId) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosDefault({
+        method: "get",
+        url: `https://vapi.vnappmob.com/api/v2/province/district/${provinceId}`,
+      });
+
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiGetPublicWards = (districtId) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosDefault({
+        method: "get",
+        url: `https://vapi.vnappmob.com/api/v2/province/ward/${districtId}`,
+      });
+
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });

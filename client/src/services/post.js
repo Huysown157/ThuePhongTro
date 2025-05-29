@@ -1,110 +1,151 @@
-import axiosConfig from '../axiosConfig'
-import axios from 'axios'
+import axiosConfig from "../axiosConfig";
+import axios from "axios";
 
-export const apiGetPosts = () => new Promise(async (resolve, reject) => {
+export const apiGetPosts = () => {
+  return new Promise(async (resolve, reject) => {
     try {
-        const response = await axiosConfig({
-            method: 'get',
-            url: '/api/v1/post/all',
-        })
-        resolve(response)
+      const response = await axiosConfig({
+        method: "get",
+        url: "api/v1/post/all",
+      });
 
+      resolve(response);
     } catch (error) {
-        reject(error)
+      reject(error);
     }
-})
-export const apiGetPostsLimit = (query) => new Promise(async (resolve, reject) => {
-    try {
-        const response = await axiosConfig({
-            method: 'get',
-            url: `/api/v1/post/limit`,
-            params: query
-        })
-        resolve(response)
+  });
+};
 
-    } catch (error) {
-        reject(error)
-    }
-})
-export const apiGetNewPosts = () => new Promise(async (resolve, reject) => {
+export const apiGetPostsLimit = (query) => {
+  // console.log(query);
+  return new Promise(async (resolve, reject) => {
     try {
-        const response = await axiosConfig({
-            method: 'get',
-            url: `/api/v1/post/new-post`,
-        })
-        resolve(response)
+      const response = await axiosConfig({
+        method: "get",
+        url: `api/v1/post/limit`,
+        params: query,
+      });
+      // console.log(response);
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
-    } catch (error) {
-        reject(error)
-    }
-})
-export const apiUploadImages = (images) => new Promise(async (resolve, reject) => {
+export const apiGetNewPosts = () => {
+  return new Promise(async (resolve, reject) => {
     try {
-        const response = await axios({
-            method: 'post',
-            url: `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUD_NAME}/image/upload/`,
-            data: images,
-        })
-        resolve(response)
+      const response = await axiosConfig({
+        method: "get",
+        url: `api/v1/post/new-post`,
+      });
 
+      resolve(response);
     } catch (error) {
-        reject(error)
+      reject(error);
     }
-})
-export const apiCreatePost = (data) => new Promise(async (resolve, reject) => {
+  });
+};
+
+export const apiCreatePost = (body) => {
+  return new Promise(async (resolve, reject) => {
     try {
-        const response = await axiosConfig({
-            method: 'post',
-            url: '/api/v1/post/create',
-            data
-        })
-        resolve(response)
+      const response = await axiosConfig({
+        method: "post",
+        url: `api/v1/post/create-post`,
+        data: body,
+      });
+
+      resolve(response);
     } catch (error) {
-        reject(error)
+      reject(error);
     }
-})
-export const apiGetUserPosts = () => new Promise(async (resolve, reject) => {
+  });
+};
+
+//UPDATE POST
+export const apiUpdatePost = (body) => {
+  return new Promise(async (resolve, reject) => {
+    // console.log(body);
     try {
-        const response = await axiosConfig({
-            method: 'get',
-            url: '/api/v1/post/user-posts',
-        })
-        resolve(response)
+      const response = await axiosConfig({
+        method: "put",
+        url: `api/v1/post/update`,
+        data: body,
+      });
+
+      resolve(response);
     } catch (error) {
-        reject(error)
+      reject(error);
     }
-})
-export const apiUpdatePost = (postId, data) => new Promise(async (resolve, reject) => {
+  });
+};
+
+//DELETE POST
+export const apiDeletePost = (id) => {
+  return new Promise(async (resolve, reject) => {
+    // console.log(id);
     try {
-        const response = await axiosConfig({
-            method: 'put',
-            url: `/api/v1/post/${postId}`,
-            data
-        });
-        resolve(response);
+      const response = await axiosConfig({
+        method: "delete",
+        url: `api/v1/post/delete`,
+        data: { id },
+      });
+
+      resolve(response);
     } catch (error) {
-        reject(error);
+      reject(error);
     }
-});
-export const apiDeletePost = (id) => new Promise(async (resolve, reject) => {
+  });
+};
+
+export const apiUploadImages = (images) => {
+  return new Promise(async (resolve, reject) => {
     try {
-        const response = await axiosConfig({
-            method: 'delete',
-            url: `/api/v1/post/${id}`,
-        })
-        resolve(response)
+      const response = await axios({
+        method: "post",
+        url: `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUD_NAME}/image/upload`,
+        data: images,
+      });
+
+      resolve(response);
     } catch (error) {
-        reject(error)
+      reject(error);
     }
-})
-export const apiGetDetailPost = (id) => new Promise(async (resolve, reject) => {
+  });
+};
+
+//GET POST BY USER ID
+export const apiGetPostsLimitByUserId = (query) => {
+  // console.log(query);
+  return new Promise(async (resolve, reject) => {
     try {
-        const response = await axiosConfig({
-            method: 'get',
-            url: `/api/v1/post/${id}`,
-        })
-        resolve(response)
+      const response = await axiosConfig({
+        method: "get",
+        url: `api/v1/post/limit-by-user`,
+        params: query,
+      });
+      // console.log(response);
+      resolve(response);
     } catch (error) {
-        reject(error)
+      reject(error);
     }
-})
+  });
+};
+
+//GET POST BY ID
+export const apiGetPostById = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosConfig({
+        method: "get",
+        url: `api/v1/post/one/${id}`,
+      });
+      // console.log(response);
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};

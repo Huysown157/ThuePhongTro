@@ -1,63 +1,193 @@
-import React, { memo, useEffect, useState } from 'react'
-import { Select, InputReadOnly } from '../components'
-import { apiGetPublicProvinces, apiGetPublicDistrict } from '../services'
+import React, { memo, useEffect, useState } from "react";
+import {
+  apiGetPublicDistricts,
+  apiGetPublicProvinces,
+  apiGetPublicWards,
+} from "../services";
+import InputReadOnly from "./InputReadOnly";
+import SelectForm from "./SelectForm";
+import { useSelector } from "react-redux";
 
-const Address = ({ setPayload }) => {
-    const [provinces, setProvinces] = useState([])
-    const [districts, setDistricts] = useState([])
-    const [province, setProvince] = useState('')
-    const [district, setDistrict] = useState('')
-    const [reset, setReset] = useState(false)
+const Address = ({ setPayload, invalidFields, setInvalidFields }) => {
+  const { dataEdit } = useSelector((state) => state.post);
 
-    useEffect(() => {
-        const fetchPublicProvince = async () => {
-            const response = await apiGetPublicProvinces()
-            if (response.status === 200) {
-                setProvinces(response?.data)
-            }
-        }
-        fetchPublicProvince()
-    }, [])
+  // console.log(dataEdit);
 
-    useEffect(() => {
-        setDistrict('')
-        const fetchPublicDistrict = async () => {
-            const response = await apiGetPublicDistrict(province)
-            if (response.status === 200) {
-                setDistricts(response.data?.districts || [])
-            }
-        }
-        province && fetchPublicDistrict()
-        !province ? setReset(true) : setReset(false)
-        !province && setDistricts([])
-    }, [province])
+  const [provinces, setProvinces] = useState([]);
+  // console.log(provinces);
 
-    useEffect(() => {
-        const selectedProvince = provinces?.find(item => item.code === +province)
-        const selectedDistrict = districts?.find(item => item.code === +district)
-        
-        setPayload(prev => ({
-            ...prev,
-            address: `${selectedDistrict?.name ? `${selectedDistrict.name},` : ''}${selectedProvince?.name || ''}`.trim(),
-            province: selectedProvince?.code || ''
-        }))
-    }, [province, district, provinces, districts])
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+  const [province, setProvince] = useState();
+  const [district, setDistrict] = useState();
+  const [ward, setWard] = useState();
+  const [reset, setReset] = useState(false);
 
-    return (
-        <div>
-            <h2 className='font-semibold text-xl py-4'>Địa chỉ cho thuê</h2>
-            <div className='flex flex-col gap-4'>
-                <div className='flex items-center gap-4'>
-                    <Select type='province' value={province} setValue={setProvince} options={provinces} label='Tỉnh/Thành phố' />
-                    <Select reset={reset} type='district' value={district} setValue={setDistrict} options={districts} label='Quận/Huyện' />
-                </div>
-                <InputReadOnly
-                    label='Địa chỉ chính xác'
-                    value={`${districts?.find(item => item.code === +district)?.name ? `${districts?.find(item => item.code === +district)?.name},` : ''} ${provinces?.find(item => item.code === +province)?.name || ''}`}
-                />
-            </div>
-        </div>
-    )
-}
+  useEffect(() => {
+    const fetchPublicProvinces = async () => {
+      const response = await apiGetPublicProvinces();
+      // console.log(response);
 
-export default memo(Address)
+      if (response.status === 200) {
+        setProvinces(response?.data?.results);
+      }
+    };
+    fetchPublicProvinces();
+  }, []);
+
+  useEffect(() => {
+    if (Object.keys(dataEdit).length > 0) {
+      let addressArr = dataEdit?.address?.split(", ");
+
+      const findDistrict =
+        districts?.length > 0 &&
+        districts?.find((item) => item.district_name === addressArr[1]);
+      setDistrict(findDistrict?.district_id || "");
+    }
+  }, [districts, dataEdit]);
+
+  useEffect(() => {
+    if (Object.keys(dataEdit).length > 0) {
+      let addressArr = dataEdit?.address?.split(", ");
+      const findWard =
+        wards?.length > 0 &&
+        wards?.find((item) => item.ward_name === addressArr[0]);
+
+      setWard(findWard?.ward_id || "");
+    }
+  }, [wards, dataEdit]);
+
+  useEffect(() => {
+    if (Object.keys(dataEdit).length > 0) {
+      let addressArr = dataEdit?.address?.split(", ");
+
+      if (provinces.length) {
+        const findProvince = provinces.find(
+          (item) => item?.province_name === addressArr[addressArr?.length - 1]
+        );
+        setProvince(findProvince?.province_id || "");
+      }
+    }
+  }, [provinces, dataEdit]);
+
+  useEffect(() => {
+    setDistrict();
+    const fetchPublicDistricts = async () => {
+      const response = await apiGetPublicDistricts(province);
+      // console.log(response);
+      if (response.status === 200) {
+        setDistricts(response?.data?.results);
+      }
+    };
+    province && fetchPublicDistricts();
+    !province ? setReset(true) : setReset(false);
+  }, [province]);
+
+  useEffect(() => {
+    setWard();
+    const fetchPublicWards = async () => {
+      const response = await apiGetPublicWards(district);
+      // console.log(response);
+      if (response.status === 200) {
+        setWards(response?.data?.results);
+      }
+    };
+    district && fetchPublicWards();
+    !district ? setReset(true) : setReset(false);
+  }, [district]);
+
+  // console.log({ province, district, ward });
+
+  //Lay data tat ca inputs
+  useEffect(() => {
+    setPayload((prev) => ({
+      ...prev,
+      address: `${
+        ward
+          ? `${wards?.find((item) => item.ward_id === ward)?.ward_name}, `
+          : ""
+      }${
+        district
+          ? `${
+              districts?.find((item) => item.district_id === district)
+                ?.district_name
+            }, `
+          : ""
+      }${
+        province
+          ? `${
+              provinces?.find((item) => item.province_id === province)
+                ?.province_name
+            }`
+          : ""
+      }`,
+      province: province
+        ? `${
+            provinces?.find((item) => item.province_id === province)
+              ?.province_name
+          }`
+        : "",
+    }));
+  }, [province, district, ward]);
+
+  return (
+    <div className="space-y-4">
+      <h2 className="font-bold text-2xl ">Địa chỉ cho thuê</h2>
+      <div className="flex w-full items-center gap-6">
+        <SelectForm
+          invalidFields={invalidFields}
+          setInvalidFields={setInvalidFields}
+          value={province}
+          setValue={setProvince}
+          options={provinces}
+          label={"Tỉnh/Thành phố"}
+          type="province"
+        />
+        <SelectForm
+          invalidFields={invalidFields}
+          setInvalidFields={setInvalidFields}
+          reset={reset}
+          value={district}
+          setValue={setDistrict}
+          options={districts}
+          label={"Quận/Huyện"}
+          type="district"
+        />
+        <SelectForm
+          invalidFields={invalidFields}
+          setInvalidFields={setInvalidFields}
+          reset={reset}
+          value={ward}
+          setValue={setWard}
+          options={wards}
+          label={"Xã/Phường"}
+          type="ward"
+        />
+      </div>
+      <InputReadOnly
+        label={"Thông tin chính xác"}
+        value={`${
+          ward
+            ? `${wards?.find((item) => item.ward_id === ward)?.ward_name}, `
+            : ""
+        }${
+          district
+            ? `${
+                districts?.find((item) => item.district_id === district)
+                  ?.district_name
+              }, `
+            : ""
+        }${
+          province
+            ? `${
+                provinces?.find((item) => item.province_id === province)
+                  ?.province_name
+              }`
+            : ""
+        }`}
+      />
+    </div>
+  );
+};
+
+export default memo(Address);

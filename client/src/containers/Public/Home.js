@@ -1,29 +1,43 @@
-import React from 'react'
-import Header from './Header'
-import { Outlet } from 'react-router-dom'
-import { Navigation, Search } from './index'
-import { Intro, Contact } from '../../components'
-import { useDispatch, useSelector } from 'react-redux'
-
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Outlet, useLocation } from "react-router-dom";
+import { Contact, Intro } from "../../components";
+import * as actions from "../../store/actions";
+import Header from "./Header";
+import { Navigation, Search } from "./index";
+import { apiGetCurrentUser } from "../../services/user";
+import { path } from "../../utils/constant";
 
 const Home = () => {
-    const { isLoggedIn } = useSelector(state => state.auth)
+  const location = useLocation();
+  // console.log(location?.pathname);
+  //Dung useEffect de goi api
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(actions.getNewPosts());
+  }, []);
 
-    return (
-        <div className='w-full flex gap-6 flex-col items-center h-full'>
-            <Header />
-            <Navigation />
-            {isLoggedIn && <Search />}
-            <div className='w-4/5 lg:w-3/5 flex flex-col items-start justify-start mt-3'>
-                <Outlet />
-            </div>
-            <Intro />
-            <Contact />
-            <div className='h-[500px]'>
+  const { isLoggedIn } = useSelector((state) => state.auth);
 
-            </div>
-        </div>
-    )
-}
+  return (
+    <div className="w-full h-full ">
+      <Header></Header>
+      <Navigation></Navigation>
+      {location?.pathname !== `/${path.LOGIN}` &&
+        location?.pathname !== `/${path.CONTACT}` &&
+        location?.pathname !== `/${path.INSTRUCTION}` &&
+        !location?.pathname?.includes("chi-tiet") && <Search />}
 
-export default Home
+      <div className="w-4/5 mx-auto flex flex-col justify-start mt-5">
+        <Outlet></Outlet>
+      </div>
+      <div className="w-4/5 mx-auto mt-5 space-y-8">
+        <Intro></Intro>
+        <Contact></Contact>
+      </div>
+      <div className="h-[100px]"></div>
+    </div>
+  );
+};
+
+export default Home;

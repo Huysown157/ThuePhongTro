@@ -1,242 +1,238 @@
-import React, { useState, useEffect, memo } from 'react'
-import icons from '../ultils/icons'
-import { getNumbersPrice, getNumbersArea } from '../ultils/Common/getNumbers'
-import { getCodes, getCodesArea } from '../ultils/Common/getCodes'
+import { Slider } from "@mui/material";
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import { getNumberFromString } from "../utils/Common/getNumberFromString";
+import icons from "../utils/icons";
 
-const { GrLinkPrevious } = icons
+const { GrLinkPrevious } = icons;
 
-const Modal = ({ setIsShowModal, content, name, handleSubmit, queries, arrMinMax, defaultText }) => {
+const Modal = ({ setIsShowModal, content, name, handleSubmit, queries }) => {
+  const { priceRanges, areaRanges } = useSelector((state) => state.app);
 
-    const [persent1, setPersent1] = useState(name === 'price' && arrMinMax?.priceArr
-        ? arrMinMax?.priceArr[0]
-        : name === 'area' && arrMinMax?.areaArr ? arrMinMax?.areaArr[0] : 0)
-    const [persent2, setPersent2] = useState(name === 'price' && arrMinMax?.priceArr
-        ? arrMinMax?.priceArr[1]
-        : name === 'area' && arrMinMax?.areaArr ? arrMinMax?.areaArr[1] : 100)
-    const [activedEl, setActivedEl] = useState('')
+  //Thiết lập tỉ số khoảng lớn nhất
+  const maxRangeScore =
+    name === "priceRange"
+      ? priceRanges[priceRanges.length - 1]?.from / 1000000 / 100
+      : areaRanges[areaRanges.length - 1]?.from / 100;
+  // console.log(maxRangeScore);
 
-    useEffect(() => {
-        const activedTrackEl = document.getElementById('track-active')
-        if (activedTrackEl) {
-            if (persent2 <= persent1) {
-                activedTrackEl.style.left = `${persent2}%`
-                activedTrackEl.style.right = `${100 - persent1}%`
-            } else {
-                activedTrackEl.style.left = `${persent1}%`
-                activedTrackEl.style.right = `${100 - persent2}%`
-            }
-        }
-    }, [persent1, persent2])
+  const [priceRange, setPriceRange] = useState([0, 100]);
+  const [priceRangeTitle, setPriceRangeTitle] = useState("");
+  const [areaRange, setAreaRange] = useState([0, 100]);
+  const [areaRangeTitle, setAreaRangeTitle] = useState("");
 
-    const handleClickTrack = (e, value) => {
-        const stackEl = document.getElementById('track')
-        const stackRect = stackEl.getBoundingClientRect()
-        let percent = value ? value : Math.round((e.clientX - stackRect.left) * 100 / stackRect.width, 0)
-        if (Math.abs(percent - persent1) <= (Math.abs(percent - persent2))) {
-            setPersent1(percent)
-        } else {
-            setPersent2(percent)
-        }
+  const handleChange = (event, newValue) => {
+    if (name === "priceRange") {
+      setPriceRange(newValue);
+      setPriceRangeTitle(
+        `${Math.round(newValue[0] * maxRangeScore)} - ${Math.round(
+          newValue[1] * maxRangeScore
+        )} triệu`
+      );
+    } else {
+      setAreaRange(newValue);
+      setAreaRangeTitle(
+        `${Math.round(newValue[0] * maxRangeScore)} - ${Math.round(
+          newValue[1] * maxRangeScore
+        )} m2`
+      );
     }
-    const convert100toTarget = percent => {
-        return name === 'price'
-            ? (Math.ceil(Math.round((percent * 1.5)) / 5) * 5) / 10
-            : name === 'area'
-                ? (Math.ceil(Math.round((percent * 0.9)) / 5) * 5)
-                : 0
-    }
-    const convertto100 = percent => {
-        let target = name === 'price' ? 15 : name === 'area' ? 90 : 1
-        return Math.floor((percent / target) * 100)
-    }
-    const handleActive = (code, value) => {
-        setActivedEl(code)
-        let arrMaxMin = name === 'price' ? getNumbersPrice(value) : getNumbersArea(value)
-        if (arrMaxMin.length === 1) {
-            if (arrMaxMin[0] === 1) {
-                setPersent1(0)
-                setPersent2(convertto100(1))
-            }
-            if (arrMaxMin[0] === 20) {
-                setPersent1(0)
-                setPersent2(convertto100(20))
-            }
-            if (arrMaxMin[0] === 15 || arrMaxMin[0] === 90) {
-                setPersent1(100)
-                setPersent2(100)
-            }
-        }
-        if (arrMaxMin.length === 2) {
-            setPersent1(convertto100(arrMaxMin[0]))
-            setPersent2(convertto100(arrMaxMin[1]))
-        }
-    }
-    const handleBeforeSubmit = (e) => {
-        let min = persent1 <= persent2 ? persent1 : persent2
-        let max = persent1 <= persent2 ? persent2 : persent1
-        let arrMinMax = [convert100toTarget(min), convert100toTarget(max)]
-        // const gaps = name === 'price'
-        //     ? getCodes(arrMinMax, content)
-        //     : name === 'area' ? getCodesArea(arrMinMax, content) : []
-        handleSubmit(e, {
-            [`${name}Number`]: arrMinMax,
-            [name]: `Từ ${convert100toTarget(min)} - ${convert100toTarget(max)} ${name === 'price' ? 'triệu' : 'm2'}`
-        }, {
-            [`${name}Arr`]: [min, max]
-        })
-    }
+  };
 
-    return (
-        <div onClick={() => { setIsShowModal(false) }}
-            className='fixed top-0 left-0 right-0 bottom-0 bg-overlay-70 z-20 flex justify-center items-center'
-        >
-            <div onClick={(e) => {
-                e.stopPropagation()
-                setIsShowModal(true)
+  const marks = [
+    [
+      {
+        value: 0,
+        label: "0",
+      },
+
+      {
+        value: 100,
+        label: `${maxRangeScore * 100} triệu+`,
+      },
+    ],
+    [
+      {
+        value: 0,
+        label: "0",
+      },
+
+      {
+        value: 100,
+        label: `${maxRangeScore * 100}m2+`,
+      },
+    ],
+  ];
+
+  //Xu li btn chon gia nhanh
+  const handleQuickSelection = (item) => {
+    if (name === "priceRange") {
+      setPriceRange([
+        item?.from / (maxRangeScore * 1000000),
+        item?.to / (maxRangeScore * 1000000),
+      ]);
+      setPriceRangeTitle(item?.title);
+    } else {
+      setAreaRange([item?.from / maxRangeScore, item?.to / maxRangeScore]);
+      setAreaRangeTitle(item?.title);
+    }
+  };
+
+  // console.log(areaRangeTitle);
+
+  const handleBeforeSubmit = (e) => {
+    if (name === "priceRange") {
+      handleSubmit(e, {
+        [name]: {
+          from: Math.round(priceRange[0] * (maxRangeScore * 1000000)),
+          to: Math.round(priceRange[1] * (maxRangeScore * 1000000)),
+        },
+        [`${name}Title`]: priceRangeTitle,
+      });
+    } else {
+      handleSubmit(e, {
+        [name]: {
+          from: Math.round(areaRange[0] * maxRangeScore),
+          to: Math.round(areaRange[1] * maxRangeScore),
+        },
+        [`${name}Title`]: areaRangeTitle,
+      });
+    }
+  };
+
+  return (
+    <div
+      onClick={() => {
+        setIsShowModal(false);
+      }}
+      className="fixed top-0 left-0 right-0 bottom-0 bg-overlay-70 z-10 flex justify-center items-center"
+    >
+      <div
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsShowModal(true);
+        }}
+        className="w-1/2 bg-white rounded-md"
+      >
+        {/* Button exit */}
+        <div className="h-[45px]  flex items-center p-3 border-b border-gray-200">
+          <span
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsShowModal(false);
             }}
-                className='w-2/5 h-[500px] bg-white rounded-md relative'
-            >
-                <div className='h-[45px] px-4 flex items-center border-b border-gray-200'>
-                    <span className='cursor-pointer' onClick={(e) => {
-                        e.stopPropagation()
-                        setIsShowModal(false)
-                    }}>
-                        <GrLinkPrevious size={24} />
-                    </span>
-                </div>
-                {(name === 'category') && <div className='p-4 flex flex-col max-h-[400px] overflow-y-auto'>
-                    <span className='py-2 flex gap-2 items-center border-b border-gray-200'>
-                        <input
-                            type="radio"
-                            name={name}
-                            value={defaultText || ''}
-                            id='default'
-                            checked={!queries[`${name}Code`] ? true : false}
-                            onChange={(e) => handleSubmit(e, { [name]: defaultText, [`${name}Code`]: null })}
-                        />
-                        <label htmlFor='default'>{defaultText}</label>
-                    </span>
-                    {content?.map(item => {
-                        return (
-                            <span key={item.code} className='py-2 flex gap-2 items-center border-b border-gray-200'>
-                                <input
-                                    type="radio"
-                                    name={name}
-                                    id={item.code}
-                                    value={item.code}
-                                    checked={item.code === queries[`${name}Code`] ? true : false}
-                                    onChange={(e) => handleSubmit(e, { [name]: item.value, [`${name}Code`]: item.code })}
-                                />
-                                <label htmlFor={item.code}>{item.value}</label>
-                            </span>
-                        )
-                    })}
-                </div>}
-                {name === 'province' && (
-                    <div className="province-list-scroll max-h-[350px] overflow-y-auto">
-                        {content?.map(item => (
-                            <label key={item.code} className="flex items-center py-2 cursor-pointer px-4">
-                                <input
-                                    type="radio"
-                                    name="province"
-                                    value={item.value}
-                                    checked={queries.province === item.value}
-                                    onChange={e => handleSubmit(e, { province: item.value, provinceCode: item.code })}
-                                    className="mr-2"
-                                />
-                                {item.value}
-                            </label>
-                        ))}
-                    </div>
-                )}
-                {(name === 'price' || name === 'area') && <div className='p-12 py-20 '>
-                    <div className='flex flex-col items-center justify-center relative'>
-                        <div className='z-30 absolute top-[-48px] font-bold text-xl text-orange-600'>
-                            {(persent1 === 100 && persent2 === 100)
-                                ? `Trên ${convert100toTarget(persent1)} ${name === 'price' ? 'triệu' : 'm2'} +`
-                                : `Từ ${persent1 <= persent2
-                                    ? convert100toTarget(persent1)
-                                    : convert100toTarget(persent2)} - ${persent2 >= persent1
-                                        ? convert100toTarget(persent2)
-                                        : convert100toTarget(persent1)} ${name === 'price'
-                                            ? 'triệu'
-                                            : 'm2'}`}
-                        </div>
-                        <div onClick={handleClickTrack} id='track' className='slider-track h-[5px] absolute top-0 bottom-0 w-full bg-gray-300 rounded-full'></div>
-                        <div onClick={handleClickTrack} id='track-active' className='slider-track-active h-[5px] absolute top-0 bottom-0 bg-orange-600 rounded-full'></div>
-                        <input
-                            max='100'
-                            min='0'
-                            step='1'
-                            type="range"
-                            value={persent1}
-                            className='w-full appearance-none pointer-events-none absolute top-0 bottom-0'
-                            onChange={(e) => {
-                                setPersent1(+e.target.value)
-                                activedEl && setActivedEl('')
-                            }}
-                        />
-                        <input
-                            max='100'
-                            min='0'
-                            step='1'
-                            type="range"
-                            value={persent2}
-                            className='w-full appearance-none pointer-events-none absolute top-0 bottom-0'
-                            onChange={(e) => {
-                                setPersent2(+e.target.value)
-                                activedEl && setActivedEl('')
-                            }}
-                        />
-                        <div className='absolute z-30 top-6 left-0 right-0 flex justify-between items-center'>
-                            <span
-                                className='cursor-pointer'
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleClickTrack(e, 0)
-                                }}
-                            >
-                                0
-                            </span>
-                            <span
-                                className='mr-[-12px] cursor-pointer'
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleClickTrack(e, 100)
-                                }}
-                            >
-                                {name === 'price' ? '15 triệu +' : name === 'area' ? 'Trên 90 m2' : ''}
-                            </span>
-                        </div>
-                    </div>
-                    <div className='mt-24'>
-                        <h4 className='font-medium mb-4'>Chọn nhanh:</h4>
-                        <div className='flex gap-2 items-center flex-wrap w-full'>
-                            {content?.map(item => {
-                                return (
-                                    <button
-                                        key={item.code}
-                                        onClick={() => handleActive(item.code, item.value)}
-                                        className={`px-4 py-2 bg-gray-200 rounded-md cursor-pointer ${item.code === activedEl ? 'bg-blue-500 text-white' : ''}`}
-                                    >
-                                        {item.value}
-                                    </button>
-                                )
-                            })}
-                        </div>
-
-                    </div>
-                </div>}
-                {(name === 'price' || name === 'area') && <button
-                    type='button'
-                    className='w-full absolute bottom-0 bg-[#FFA500] py-2 font-medium rounded-bl-md rounded-br-md'
-                    onClick={handleBeforeSubmit}
-                >
-                    ÁP DỤNG
-                </button>}
-            </div>
+            className="cursor-pointer"
+          >
+            <GrLinkPrevious />
+          </span>
         </div>
-    )
-}
 
-export default memo(Modal)
+        {/* Category and Province */}
+        {(name === "category" || name === "province") && (
+          <div className="p-4 select-none">
+            {content?.map((item) => {
+              return (
+                <div
+                  key={item?.id}
+                  className="flex items-center gap-2  border-b border-gray-200"
+                >
+                  <input
+                    type="radio"
+                    name={name}
+                    id={item?.id}
+                    value={item?.id}
+                    checked={item.id === queries[`${name}Id`] ? true : false}
+                    onChange={(e) =>
+                      handleSubmit(e, {
+                        [name]: item.title,
+                        [`${name}Id`]: item.id,
+                      })
+                    }
+                  />
+                  <label className="w-full py-2" htmlFor={item.id}>
+                    {item.title}
+                  </label>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Prices and Area */}
+        {(name === "priceRange" || name === "areaRange") && (
+          <div className="p-4">
+            <div className="text-center font-bold text-orange-500 text-xl h-10">
+              {/* {priceRange[0] === 100 || areaRange[0] === 100
+                ? `Trên ${convert100ToPriceOrArea(
+                    name === "priceRange" ? priceRange[0] : areaRange[0]
+                  )} ${name === "priceRange" ? "triệu" : "m2"}`
+                : `${convert100ToPriceOrArea(
+                    name === "priceRange" ? priceRange[0] : areaRange[0]
+                  )} - ${convert100ToPriceOrArea(
+                    name === "priceRange" ? priceRange[1] : areaRange[1]
+                  )} ${name === "priceRange" ? "triệu" : "m2"}`} */}
+              {name === "priceRange" ? priceRangeTitle : areaRangeTitle}
+            </div>
+
+            <div className="px-5">
+              <Slider
+                getAriaLabel={() => "Prices and Areas range"}
+                value={name === "priceRange" ? priceRange : areaRange}
+                // value={priceRange}
+                onChange={handleChange}
+                valueLabelDisplay="off"
+                step={1}
+                size={"medium"}
+                marks={name === "priceRange" ? marks[0] : marks[1]}
+                className="font-bold"
+              />
+            </div>
+
+            <div>
+              <h4 className="font-medium mb-6">Chọn nhanh</h4>
+              {(name === "priceRange" ? priceRanges : areaRanges).map(
+                (item) => {
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={(e) => handleQuickSelection(item)}
+                      className="bg-primary  m-1 rounded-md px-2 py-1 select-none focus:bg-secondary1 focus:text-white"
+                    >
+                      {item.title}
+                    </button>
+                  );
+                }
+              )}
+
+              {/* {name === "areaRange" &&
+                areaRanges.map((item) => {
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleSelectArea(item.title)}
+                      className="bg-primary  m-1 rounded-md px-2 py-1 select-none focus:bg-secondary1 focus:text-white"
+                    >
+                      {item.title}
+                    </button>
+                  );
+                })} */}
+            </div>
+          </div>
+        )}
+        {(name === "priceRange" || name === "areaRange") && (
+          <div>
+            <button
+              onClick={(e) => handleBeforeSubmit(e)}
+              className="w-full rounded-bl-md rounded-br-md bg-orange-400 py-2 font-medium uppercase"
+              type="button"
+            >
+              Áp dụng
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Modal;

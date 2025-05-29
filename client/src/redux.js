@@ -1,13 +1,15 @@
 import rootReducer from "./store/reducers/rootReducer";
-import { persistStore } from "redux-persist";
+import { persistStore } from "redux-persist"; //luu giu store
 import { createStore, applyMiddleware } from "redux";
-import thunk from 'redux-thunk'
+import thunk from "redux-thunk";
 
 const reduxStore = () => {
-    const store = createStore(rootReducer, applyMiddleware(thunk)) 
-    const persistor = persistStore(store)
+  const store = createStore(rootReducer, applyMiddleware(thunk));
+  const persistor = persistStore(store);
 
-    return { store, persistor }
-}
+  return { store, persistor };
+};
 
-export default reduxStore
+export default reduxStore;
+
+//thunk cho phep goi api trong luc dispatch 1 action len reducer

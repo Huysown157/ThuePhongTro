@@ -1,47 +1,83 @@
-import React from 'react'
-import anonAvatar from '../../assets/anon-avatar.png'
-import { useSelector, useDispatch } from 'react-redux'
-import menuSidebar from '../../ultils/menuSidebar'
-import { NavLink } from 'react-router-dom'
-import * as actions from '../../store/actions'
-import { AiOutlineLogout } from 'react-icons/ai'
-
-const activeStyle = 'hover:bg-gray-200 flex  rounded-md items-center gap-2 py-2 font-bold bg-gray-200'
-const notActiceStyle = 'hover:bg-gray-200 flex  rounded-md items-center gap-2 py-2 cursor-pointer'
+import React from "react";
+import anonAvatar from "../../assets/anon-avatar.png";
+import { useDispatch, useSelector } from "react-redux";
+import { menuSidebar } from "../../utils/menuSidebar";
+import { NavLink } from "react-router-dom";
+import * as actions from "../../store/actions";
+import { menuSidebarAdmin } from "../../utils/menuSidebarAdmin";
 
 const Sidebar = () => {
+  const { currentUser } = useSelector((state) => state.user);
+  // console.log(currentUser.role);
+  const dispatch = useDispatch();
 
-    const dispatch = useDispatch()
-    const { currentData } = useSelector(state => state.user)
-    return (
-        <div className='w-[256px] flex-none p-4 flex flex-col gap-6'>
-            <div className='flex flex-col gap-4'>
-                <div className='flex items-center gap-4'>
-                    <img src={anonAvatar} alt="avatar" className='w-12 h-12 object-cover rounded-full border-2 border-white' />
-                    <div className='flex flex-col justify-center'>
-                        <span className='font-semibold'>{currentData?.name}</span>
-                        <small>{currentData?.phone}</small>
-                    </div>
-                </div>
-                <span >Mã thành viên: <small className='font-medium'>{currentData?.id?.match(/\d/g).join('')?.slice(0, 6)}</small></span>
-            </div>
-            <div>
-                {menuSidebar.map(item => {
-                    return (
-                        <NavLink
-                            className={({ isActive }) => isActive ? activeStyle : notActiceStyle}
-                            key={item.id}
-                            to={item?.path}
-                        >
-                            {item?.icon}
-                            {item.text}
-                        </NavLink>
-                    )
-                })}
-                <span onClick={() => dispatch(actions.logout())} className={notActiceStyle}><AiOutlineLogout />Thoát</span>
-            </div>
+  const handleLink = (text) => {
+    // console.log(text);
+    if (text === "Đăng xuất") {
+      dispatch(actions.logout());
+    }
+  };
+
+  return (
+    <div className="p-4 space-y-5">
+      <div>
+        <div className="flex gap-3 items-center mb-3">
+          <img
+            src={currentUser?.avatar || anonAvatar}
+            alt="avatar"
+            className="w-12 h-12 object-cover rounded-full"
+          />
+          <div className="text-left">
+            <p className="font-semibold">{currentUser?.fullName}</p>
+            <p className="text-sm">{currentUser?.phone}</p>
+          </div>
         </div>
-    )
-}
+        <span>
+          Mã thành viên:{" "}
+          <span className="font-semibold">{`${currentUser?.id}`}</span>
+        </span>
+      </div>
 
-export default Sidebar
+      <div>
+        {currentUser?.role === "admin" &&
+          menuSidebarAdmin?.map((item) => {
+            return (
+              <NavLink
+                key={item.id}
+                onClick={() => handleLink(item.text)}
+                to={item?.path}
+                className={({ isActive }) =>
+                  isActive
+                    ? "flex items-center gap-2 py-2 border-b font-semibold  hover:bg-gray-200"
+                    : "flex items-center gap-2 py-2 border-b  hover:bg-gray-200"
+                }
+              >
+                {item?.icon}
+                {item.text}
+              </NavLink>
+            );
+          })}
+
+        {menuSidebar.map((item) => {
+          return (
+            <NavLink
+              key={item.id}
+              onClick={() => handleLink(item.text)}
+              to={item?.path}
+              className={({ isActive }) =>
+                isActive
+                  ? "flex items-center gap-2 py-2 border-b font-semibold  hover:bg-gray-200"
+                  : "flex items-center gap-2 py-2 border-b  hover:bg-gray-200"
+              }
+            >
+              {item?.icon}
+              {item.text}
+            </NavLink>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+export default Sidebar;
